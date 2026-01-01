@@ -24,8 +24,10 @@ const CollectionsPage = () => {
     //Add Event Listener for Clicks
     document.addEventListener("mousedown", handleClickOutside);
     //clean Event Listener
-    document.removeEventListener("mousedown", handleClickOutside);
-  });
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -94,7 +96,9 @@ const CollectionsPage = () => {
       {/*  Filter Sidebar */}
       <div
         ref={sideBarRef}
-        className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300 lg:static lg:translate-x-0`}
+        className={`${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300 lg:static lg:translate-x-0`}
       >
         <FIlterSidebar />
       </div>

@@ -26,9 +26,9 @@ const Navbar = () => {
       <nav className="container mx-auto flex justify-between items-center py-4 px-6">
         <div className="flex items-center gap-3">
           <img
-            src="https://imgs.search.brave.com/o1WwjdoIaMfmSypJrY0ysnC_AaLxmtILOzpMnSwOSC8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvcHJldmll/dy0xeC8wOS8zNC9z/aG9wcGluZy1iYWct/bGV0dGVyLXctbG9n/by12ZWN0b3ItMjkw/MzA5MzQuanBn"
+            src="https://imgs.search.brave.com/w1cLA8fJCoRPSfWHjXdWYGmV8YhDkhD6BDDqWR4Py7E/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAxNi8w/OS8zMC8xNy8yOS9z/aG9wcGluZy0xNzA1/ODAwXzY0MC5wbmc"
             alt="logo"
-            className="h-10 w-10 rounded-xl"
+            className="h-10 w-10 rounded-xl "
           />
           <Link to={"/"} className="text-2xl font-medium">
             MegaHive
