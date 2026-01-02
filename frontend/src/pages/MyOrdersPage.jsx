@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MyOrdersPage = () => {
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
@@ -13,7 +15,7 @@ const MyOrdersPage = () => {
           ordersItems: [
             {
               name: "Product 1",
-              image: "https://picsum.picture/500/500?random=1",
+              image: "https://picsum.photos/150?random=1",
             },
           ],
           totalPrice: 100,
@@ -26,7 +28,7 @@ const MyOrdersPage = () => {
           ordersItems: [
             {
               name: "Product 2",
-              image: "https://picsum.picture/500/500?random=2",
+              image: "https://picsum.photos/500/500?random=2",
             },
           ],
           totalPrice: 100,
@@ -39,7 +41,7 @@ const MyOrdersPage = () => {
           ordersItems: [
             {
               name: "Product 1",
-              image: "https://picsum.picture/500/500?random=3",
+              image: "https://picsum.photos/500/500?random=3",
             },
           ],
           totalPrice: 100,
@@ -50,6 +52,10 @@ const MyOrdersPage = () => {
       setOrders(mockOrders);
     }, 1000);
   }, []);
+
+  const handleRowClick = (orderId) => {
+    navigate(`/order/${orderId}`)
+  }
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold mb-4">My Orders</h2>
@@ -71,6 +77,7 @@ const MyOrdersPage = () => {
               orders.map((order) => (
                 <tr
                   key={order._id}
+                  onClick={() => handleRowClick(order._id)}
                   className="border-b hover:border-gray-50 cursor-pointer"
                 >
                   <td className="px-2 py-2 sm:py-4 sm:px-4">
@@ -99,8 +106,14 @@ const MyOrdersPage = () => {
                     ${order.totalPrice}
                   </td>
                   <td className="px-2 py-2 sm:px-4 sm:py-4">
-                    <span className={`${order.isPaid ? "bg-green-100 text-green-700 " : "bg-red-100 text-red-700"} px-2 py-1 rounded-full text-xs sm:text-sm font-medium`}>
-                        {order.isPaid ? "Paid" : "Pending"}
+                    <span
+                      className={`${
+                        order.isPaid
+                          ? "bg-green-100 text-green-700 "
+                          : "bg-red-100 text-red-700"
+                      } px-2 py-1 rounded-full text-xs sm:text-sm font-medium`}
+                    >
+                      {order.isPaid ? "Paid" : "Pending"}
                     </span>
                   </td>
                 </tr>
