@@ -96,29 +96,44 @@ Follow these steps to set up the project locally:
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/MegaHive.git
-   cd second-brain
+   cd fron
    ```
 
-2. Install dependencies:
+2.Setup Backend:
    ```bash
+   cd backend
    npm install
+
    ```
 
 3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
+   Create a `.env` file inside the backend folder and add:
    ```env
    MONGO_URI=your-mongodb-connection-string
    JWT_SECRET=your-secret-key
    PORT=5000
    ```
 
-4. Run the application:
+4. Run Backend Server:
+   ```bash
+   npm start
+   ```
+
+   
+
+5. Setup Frontend:
+   ```bash
+   cd frontend
+   npm install
+
+   ```
+6. Run Frontend Application:
    ```bash
    npm run dev
    ```
-
-5. Access the app:
-   Open `http://localhost:5173` in your browser.
+7. Access MegaHive:
+Open your browser and visit:
+[text](http://localhost:5173)
 
 
 ## Contributing
