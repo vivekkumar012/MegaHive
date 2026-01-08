@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv"
 import connectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
+import productRouter from "./routes/productRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -20,7 +21,8 @@ app.get("/", (req, res) => {
 
 //API ROutes
 app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
 
 app.listen(port, () => {
-    console.log(`App is Listening on PORT${port}`);
+    console.log(`App is Listening on PORT ${port}`);
 })
