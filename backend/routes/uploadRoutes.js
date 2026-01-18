@@ -43,8 +43,7 @@ uploadRouter.post("/", upload.single("image"), async (req, res) => {
 
         res.status(200).json({
             message: "Upload successful",
-            url: result.secure_url,
-            public_id: result.public_id,
+            imageUrl: result.secure_url,
         });
 
     } catch (error) {
