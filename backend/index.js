@@ -10,6 +10,8 @@ import orderRouter from "./routes/orderRoutes.js";
 import uploadRouter from "./routes/uploadRoutes.js";
 import subscriberRouter from "./routes/subscriberRoute.js";
 import adminRouter from "./routes/adminRoutes.js";
+import productAdminRouter from "./routes/productAdminRoutes.js";
+import adminOrderRouter from "./routes/adminOrderRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -36,6 +38,8 @@ app.use("/api", subscriberRouter);
 
 //Admin
 app.use("/api/admin/users", adminRouter);
+app.use("/api/admin/products", productAdminRouter);
+app.use("/api/admin/orders", adminOrderRouter);
 
 app.listen(port, () => {
     console.log(`App is Listening on PORT ${port}`);
