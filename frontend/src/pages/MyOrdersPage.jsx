@@ -1,61 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchUserOrders } from "../redux/slices/orderSlice";
 
 const MyOrdersPage = () => {
-  const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          _id: "12345",
-          createdAt: new Date(),
-          shippingAddress: { city: "Darbhanga", country: "India" },
-          ordersItems: [
-            {
-              name: "Product 1",
-              image: "https://picsum.photos/150?random=1",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "13555",
-          createdAt: new Date(),
-          shippingAddress: { city: "Darbhanga", country: "India" },
-          ordersItems: [
-            {
-              name: "Product 2",
-              image: "https://picsum.photos/500/500?random=2",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "25648",
-          createdAt: new Date(),
-          shippingAddress: { city: "Darbhanga", country: "India" },
-          ordersItems: [
-            {
-              name: "Product 1",
-              image: "https://picsum.photos/500/500?random=3",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-      ];
+  const dispatch = useDispatch();
+  const { orders, loading, error } = useSelector((state) => state.orders);
 
-      setOrders(mockOrders);
-    }, 1000);
-  }, []);
+  useEffect(() => {
+    dispatch(fetchUserOrders());
+  });
 
   const handleRowClick = (orderId) => {
-    navigate(`/order/${orderId}`)
-  }
+    navigate(`/order/${orderId}`);
+  };
+
+  if (loading) return <p>Loading ...</p>;
+  if (error) return <p>Error: {error}</p>;
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold mb-4">My Orders</h2>
@@ -91,7 +54,7 @@ const MyOrdersPage = () => {
                     #{order._id}
                   </td>
                   <td className="px-2 py-2 sm:px-4 sm:py-4">
-                    {new Date(order.createdAt).toLocaleDateString}
+                    {new Date(order.createdAt).toLocaleDateString}{""}
                     {new Date(order.createdAt).toLocaleTimeString}
                   </td>
                   <td className="px-2 py-2 sm:px-4 sm:py-4">

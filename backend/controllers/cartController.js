@@ -1,7 +1,6 @@
 import { cartModel } from "../models/cartModel.js";
 import { productModel } from "../models/productModel.js";
 
-
 const getCart = async (userId, guestId) => {
     if (userId) {
         return await cartModel.findOne({ user: userId });
@@ -11,6 +10,14 @@ const getCart = async (userId, guestId) => {
     return null;
 }
 
+// Helper function to safely calculate total price
+const calculateTotalPrice = (products) => {
+    return products.reduce((acc, item) => {
+        const price = Number(item.price) || 0;
+        const quantity = Number(item.quantity) || 0;
+        return acc + (price * quantity);
+    }, 0);
+}
 
 export const createCart = async (req, res) => {
     try {
@@ -65,11 +72,8 @@ export const createCart = async (req, res) => {
                 });
             }
 
-            // Recalculate the total price
-            cart.totalPrice = cart.products.reduce((acc, item) => {
-                const itemTotal = (item.price || 0) * (item.quantity || 0);
-                return acc + itemTotal;
-            }, 0);
+            // Recalculate the total price using helper function
+            cart.totalPrice = calculateTotalPrice(cart.products);
 
             await cart.save();
             return res.status(200).json(cart);
@@ -107,22 +111,38 @@ export const updateQuantityCart = async (req, res) => {
     const { productId, quantity, size, color, guestId, userId } = req.body;
 
     try {
+        // Validate quantity
+        const parsedQuantity = parseInt(quantity);
+        if (isNaN(parsedQuantity)) {
+            return res.status(400).json({
+                message: "Invalid quantity"
+            });
+        }
+
         let cart = await getCart(userId, guestId);
         if (!cart) {
             return res.status(403).json({
                 message: "Cart not found"
             })
         }
-        const productIndex = cart.products.findIndex((p) => p.productId.toString() === productId && p.size === size && p.color === color);
+
+        const productIndex = cart.products.findIndex((p) =>
+            p.productId.toString() === productId &&
+            p.size === size &&
+            p.color === color
+        );
 
         if (productIndex > -1) {
             //update quantity
-            if (quantity > 0) {
-                cart.products[productIndex].quantity = quantity
+            if (parsedQuantity > 0) {
+                cart.products[productIndex].quantity = parsedQuantity;
             } else {
                 cart.products.splice(productIndex, 1); //remove prod if quan is 0
             }
-            cart.totalPrice = cart.products.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+            // Safely calculate total price
+            cart.totalPrice = calculateTotalPrice(cart.products);
+
             await cart.save();
             return res.status(200).json(cart);
         } else {
@@ -139,7 +159,7 @@ export const updateQuantityCart = async (req, res) => {
 }
 
 export const deleteCartItem = async (req, res) => {
-    const { productId, quantity, size, color, guestId, userId } = req.body;
+    const { productId, size, color, guestId, userId } = req.body;
     try {
         let cart = await getCart(userId, guestId);
         if (!cart) {
@@ -148,12 +168,18 @@ export const deleteCartItem = async (req, res) => {
             })
         }
 
-        const productIndex = cart.products.findIndex((p) => p.productId.toString() === productId && p.size === size && p.color === color);
+        const productIndex = cart.products.findIndex((p) =>
+            p.productId.toString() === productId &&
+            p.size === size &&
+            p.color === color
+        );
 
         if (productIndex > -1) {
             cart.products.splice(productIndex, 1);
 
-            cart.totalPrice = cart.products.reduce((acc, item) => acc + item.price * item.quantity, 0);
+            // Safely calculate total price
+            cart.totalPrice = calculateTotalPrice(cart.products);
+
             await cart.save();
             return res.status(200).json(cart)
         } else {
@@ -202,26 +228,31 @@ export const mergeCart = async (req, res) => {
                 })
             }
             if (userCart) {
-                //Merge with guest cart'
+                //Merge with guest cart
                 guestCart.products.forEach((guestItem) => {
-                    const productIndex = userCart.products.findIndex((item) => item.productId.toString() === guestItem.productId.toString() && item.size === guestItem.size && item.color === guestItem.color);
+                    const productIndex = userCart.products.findIndex((item) =>
+                        item.productId.toString() === guestItem.productId.toString() &&
+                        item.size === guestItem.size &&
+                        item.color === guestItem.color
+                    );
 
-                    if(productIndex > -1) {
+                    if (productIndex > -1) {
                         //if the item exist in user cart update the quantity
                         userCart.products[productIndex].quantity += guestItem.quantity;
-
                     } else {
                         // Otherwise add the guest item to the cart
                         userCart.products.push(guestItem);
                     }
                 });
 
-                userCart.totalPrice = userCart.products.reduce((acc, item) => acc + item.price * item.quantity, 0);
+                // Safely calculate total price
+                userCart.totalPrice = calculateTotalPrice(userCart.products);
+
                 await userCart.save();
 
                 //Remove the Guest Cart
                 try {
-                    await cartModel.findOneAndDelete({guestId});
+                    await cartModel.findOneAndDelete({ guestId });
                 } catch (error) {
                     console.log("Error deleting guest cart:", error)
                 }
@@ -235,7 +266,7 @@ export const mergeCart = async (req, res) => {
                 res.status(200).json(guestCart);
             }
         } else {
-            if(userCart) {
+            if (userCart) {
                 return res.status(200).json(userCart);
             }
             res.status(404).json({

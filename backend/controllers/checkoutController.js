@@ -23,7 +23,7 @@ export const createCheckOut = async (req, res) => {
             isPaid: false
         });
         console.log(`Checkout created for user: ${req.user._id}`);
-        res.status(201).json(newCheckout);
+        res.status(200).json(newCheckout);
 
     } catch (error) {
         console.log(error);
@@ -52,7 +52,7 @@ export const updatePayStatus = async (req, res) => {
             checkout.paidAt = Date.now();
             await checkout.save();
 
-            res.status(201).json(checkout);
+            res.status(200).json(checkout);
         } else {
             res.status(400).json({
                 message: "Invalid Payment Status"
@@ -97,7 +97,7 @@ export const finalizeCheckOut = async (req, res) => {
 
             //Delete the cart associated with the user
             await cartModel.findByIdAndDelete({ user: checkout.user });
-            res.status(201).json(finalOrder);
+            res.status(200).json(finalOrder);
 
         } else if (checkout.isFinalized) {
             res.status(400).json({

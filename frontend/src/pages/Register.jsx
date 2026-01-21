@@ -1,24 +1,50 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import register from "../assets/register.webp";
 import { registerUser } from "../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { mergeCart } from "../redux/slices/cartSlice";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        dispatch(registerUser({name, email, password}));
+  const { user, guestId } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
+
+  //Get redirect parameter and check if it's checkout or something
+  const redirect = new URLSearchParams(location.search).get("redirect") || "/";
+  const isCheckoutRedirect = redirect.includes("checkout");
+
+  useEffect(() => {
+    if (user) {
+      if (cart?.products.length > 0 && guestId) {
+        dispatch(mergeCart({ guestId, user })).then(() => {
+          navigate(isCheckoutRedirect ? "/checkout" : "/");
+        });
+      } else {
+        navigate(isCheckoutRedirect ? "/checkout" : "/");
+      }
     }
+  }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(registerUser({ name, email, password }));
+  };
 
   return (
     <div className="flex">
       <div className="w-full flex md:w-1/2 flex-col justify-center items-center p-8 md:p-12">
-        <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded-lg border shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md bg-white p-8 rounded-lg border shadow-sm"
+        >
           <div className="flex justify-center mb-6">
             <h2 className="text-xl font-medium">MegaHive</h2>
           </div>
@@ -64,7 +90,7 @@ const Register = () => {
           </button>
           <p className="text-center mt-6 text-sm space-x-2">
             <span>Already have an account?</span>
-            <Link to={"/login"} className="text-blue-500 underline">
+            <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500 underline">
               Login
             </Link>
           </p>
