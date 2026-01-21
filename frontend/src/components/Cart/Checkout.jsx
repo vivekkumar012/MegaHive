@@ -32,15 +32,36 @@ const Checkout = () => {
 
   const handleCreateCheckout = async (e) => {
     e.preventDefault();
+    
     if (cart && cart.products.length > 0) {
+      // Transform cart products to match backend schema
+      const checkoutItems = cart.products.map(product => ({
+        productId: product.productId || product._id,
+        name: product.name,
+        image: product.image,
+        price: product.price, // ← This is required
+        quantity: product.quantity,
+        size: product.size,
+        color: product.color
+      }));
+
+      // Debug log to verify data structure
+      console.log("Checkout items being sent:", checkoutItems);
+
       const res = await dispatch(
         createCheckout({
-          checkoutItems: cart.products,
-          shippingAddress,
+          checkoutItems: checkoutItems, // ← Use transformed items
+          shippingAddress: {
+            address: `${shippingAddress.firstName} ${shippingAddress.lastName}, ${shippingAddress.address}`,
+            city: shippingAddress.city,
+            postalCode: shippingAddress.postalCode,
+            country: shippingAddress.country,
+          },
           paymentMethod: "PayPal",
           totalPrice: cart.totalPrice,
         }),
       );
+      
       if (res.payload && res.payload._id) {
         setCheckOutId(res.payload._id);
       }
@@ -158,6 +179,7 @@ const Checkout = () => {
                 })
               }
               className="w-full p-2 border rounded"
+              required
             />
           </div>
 
@@ -206,6 +228,7 @@ const Checkout = () => {
                 })
               }
               className="w-full p-2 border rounded"
+              required
             />
           </div>
 
@@ -265,7 +288,7 @@ const Checkout = () => {
                 <div>
                   <h3 className="text-md">{product.name}</h3>
                   <p className="text-gray-500">Size: {product.size}</p>
-                  <p className="text-gray-500">Size: {product.color}</p>
+                  <p className="text-gray-500">Color: {product.color}</p>
                 </div>
               </div>
               <p className="text-xl">${product.price?.toLocaleString()}</p>

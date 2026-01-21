@@ -46,6 +46,7 @@ const ProductDetails = ({ productId }) => {
       setQuantity((prev) => prev - 1);
     }
   };
+  
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
