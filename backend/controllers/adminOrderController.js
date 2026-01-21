@@ -15,7 +15,7 @@ export const getAllOrdersAdmin = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
     try {
-        const order = await orderModel.findById(req.params.id);
+        const order = await orderModel.findById(req.params.id).populate("user", "name");
         if (order) {
             order.status = req.body.status;
             order.isDelivered = req.body.status === "Delivered" ? true : order.isDelivered;

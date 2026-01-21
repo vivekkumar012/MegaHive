@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import MyOrdersPage from "./MyOrdersPage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/slices/authSlice";
 import { clearCart } from "../redux/slices/cartSlice";
 
 const Profile = () => {
-  const {user} = useDispatch((state) => state.auth);
+  const {user} = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   

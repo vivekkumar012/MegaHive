@@ -99,7 +99,7 @@ const Navbar = () => {
             <SearchBar />
           </div>
 
-          <button onClick={setNavDrawerOpen} className="md:hidden">
+          <button onClick={toggleNavDrawer} className="md:hidden">
             <HiBars3BottomRight className="h-6 w-6 text-gray-700 " />
           </button>
         </div>

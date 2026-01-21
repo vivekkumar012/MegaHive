@@ -11,7 +11,7 @@ const MyOrdersPage = () => {
 
   useEffect(() => {
     dispatch(fetchUserOrders());
-  });
+  }, [dispatch]);
 
   const handleRowClick = (orderId) => {
     navigate(`/order/${orderId}`);
