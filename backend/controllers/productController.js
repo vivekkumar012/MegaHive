@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { productModel } from "../models/productModel.js";
 
 export const createProduct = async (req, res) => {
@@ -217,15 +218,23 @@ export const getProduct = async (req, res) => {
 export const getCategoryProduct = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // ✅ Prevent CastError
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid product ID"
+            });
+        }
+
         const product = await productModel.findById(id);
         if (!product) {
             return res.status(404).json({
                 message: "Product not found"
-            })
+            });
         }
 
         const similarProducts = await productModel.find({
-            _id: { $ne: id }, //Exclude the curr product id
+            _id: { $ne: product._id }, // ✅ use ObjectId, not string
             gender: product.gender,
             category: product.category
         }).limit(4);
@@ -237,9 +246,10 @@ export const getCategoryProduct = async (req, res) => {
         res.status(500).json({
             message: "Server Error",
             error: error.message
-        })
+        });
     }
-}
+};
+
 
 export const getHigherRatedProduct = async (req, res) => {
     try {

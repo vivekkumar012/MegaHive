@@ -37,25 +37,25 @@ const Navbar = () => {
 
         <div className="hidden md:flex space-x-6">
           <Link
-            to={"/collections/all"}
+            to={"/collections/all?gender=Men"}
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             MEN
           </Link>
           <Link
-            to={"#"}
+            to={"/collections/all?gender=Women"}
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             WOMEN
           </Link>
           <Link
-            to={"#"}
+            to={"/collections/all?category=Top Wear"}
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             Top Wear
           </Link>
           <Link
-            to={"#"}
+            to={"/collections/all?category=Bottom Wear"}
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             Bottom Wear
@@ -102,28 +102,28 @@ const Navbar = () => {
           <h2 className="text-xl font-semibold mb-4">Menu</h2>
           <nav className="space-y-4">
             <Link
-              to="#"
+              to="/collections/all?gender=Men"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black"
             >
               Men
             </Link>
             <Link
-              to="#"
+              to="/collections/all?gender=Women"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black"
             >
               Women
             </Link>
             <Link
-              to="#"
+              to="/collections/all?category=Top wear"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black"
             >
               Top Wear
             </Link>
             <Link
-              to="#"
+              to="/collections/all?category=Bottom wear"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black"
             >
