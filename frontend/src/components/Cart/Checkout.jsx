@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import PaypalButton from "./PaypalButton";
+import PayPalButton from "./PayPalButton";
 import { useDispatch, useSelector } from "react-redux";
-import { createCheckout } from "../../redux/slices/checkoutSlice";
-import axios from "axios";
 
-const Checkout = () => {
+import axios from "axios";
+import { createCheckout } from "../../redux/slices/checkoutSlice";
+
+const CheckOut = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { cart, loading, error } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
 
-  const [checkoutId, setCheckOutId] = useState(null);
-
-  const [shippingAddress, setShippingAddress] = useState({
+  const [checkoutId, setCheckoutId] = useState(null);
+  const [shippingAddress, setShippingaAddress] = useState({
     firstName: "",
     lastName: "",
     address: "",
@@ -23,48 +23,50 @@ const Checkout = () => {
     phone: "",
   });
 
-  // Ensure cart is loaded before processing
+  // Calculate total price from cart products
+  const totalPrice = useMemo(() => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      return 0;
+    }
+    
+    // First try to use cart.totalPrice if it exists and is valid
+    if (cart.totalPrice && Number(cart.totalPrice) > 0) {
+      return Number(cart.totalPrice);
+    }
+    
+    // Otherwise calculate from products
+    const calculated = cart.products.reduce((sum, product) => {
+      const price = Number(product.price) || 0;
+      const quantity = Number(product.quantity) || 1;
+      return sum + (price * quantity);
+    }, 0);
+    
+    return calculated;
+  }, [cart]);
+
+  //Ensure that cart is loaded before proceeding
   useEffect(() => {
-    if (!cart || !cart.products || cart.products.length == 0) {
+    if (!cart || !cart.products || cart.products.length === 0) {
       navigate("/");
     }
   }, [cart, navigate]);
 
   const handleCreateCheckout = async (e) => {
     e.preventDefault();
-    
-    if (cart && cart.products.length > 0) {
-      // Transform cart products to match backend schema
-      const checkoutItems = cart.products.map(product => ({
-        productId: product.productId || product._id,
-        name: product.name,
-        image: product.image,
-        price: product.price, // ← This is required
-        quantity: product.quantity,
-        size: product.size,
-        color: product.color
-      }));
-
-      // Debug log to verify data structure
-      console.log("Checkout items being sent:", checkoutItems);
-
+    if (cart && cart.products.length > 0 && totalPrice > 0) {
       const res = await dispatch(
         createCheckout({
-          checkoutItems: checkoutItems, // ← Use transformed items
-          shippingAddress: {
-            address: `${shippingAddress.firstName} ${shippingAddress.lastName}, ${shippingAddress.address}`,
-            city: shippingAddress.city,
-            postalCode: shippingAddress.postalCode,
-            country: shippingAddress.country,
-          },
-          paymentMethod: "PayPal",
-          totalPrice: cart.totalPrice,
-        }),
+          checkoutItems: cart.products,
+          shippingAddress,
+          paymentMethod: "Paypal",
+          totalPrice: totalPrice,
+        })
       );
-      
       if (res.payload && res.payload._id) {
-        setCheckOutId(res.payload._id);
+        setCheckoutId(res.payload._id);
       }
+    } else {
+      alert("Unable to proceed. Cart total is $0. Please check your cart.");
     }
   };
 
@@ -80,46 +82,42 @@ const Checkout = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        },
+        }
       );
       await handleFinalizeCheckout(checkoutId);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const handleFinalizeCheckout = async (checkoutId) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/checkout/${checkoutId}/finalize`,
         {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        },
+        }
       );
       navigate("/order-confirmation");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  if (loading) {
-    return <p>Loading cart...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
+  if (loading) return <p>Loading cart ...</p>;
+  if (error) return <p>Error: {error}</p>;
   if (!cart || !cart.products || cart.products.length === 0) {
-    return <p>Your Cart is Empty</p>;
+    return <p>Your cart is empty</p>;
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
-      {/* Left Section */}
+      {/* left section */}
       <div className="bg-white rounded-lg p-6">
         <h2 className="text-2xl uppercase mb-6">Checkout</h2>
         <form onSubmit={handleCreateCheckout}>
@@ -141,7 +139,7 @@ const Checkout = () => {
                 type="text"
                 value={shippingAddress.firstName}
                 onChange={(e) =>
-                  setShippingAddress({
+                  setShippingaAddress({
                     ...shippingAddress,
                     firstName: e.target.value,
                   })
@@ -156,7 +154,7 @@ const Checkout = () => {
                 type="text"
                 value={shippingAddress.lastName}
                 onChange={(e) =>
-                  setShippingAddress({
+                  setShippingaAddress({
                     ...shippingAddress,
                     lastName: e.target.value,
                   })
@@ -166,14 +164,13 @@ const Checkout = () => {
               />
             </div>
           </div>
-
           <div className="mb-4">
-            <label className="block text-gray-700 ">Address</label>
+            <label className="block text-gray-700">Address</label>
             <input
               type="text"
               value={shippingAddress.address}
               onChange={(e) =>
-                setShippingAddress({
+                setShippingaAddress({
                   ...shippingAddress,
                   address: e.target.value,
                 })
@@ -182,15 +179,14 @@ const Checkout = () => {
               required
             />
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="mb-4 grid grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700">City</label>
               <input
                 type="text"
                 value={shippingAddress.city}
                 onChange={(e) =>
-                  setShippingAddress({
+                  setShippingaAddress({
                     ...shippingAddress,
                     city: e.target.value,
                   })
@@ -205,7 +201,7 @@ const Checkout = () => {
                 type="text"
                 value={shippingAddress.postalCode}
                 onChange={(e) =>
-                  setShippingAddress({
+                  setShippingaAddress({
                     ...shippingAddress,
                     postalCode: e.target.value,
                   })
@@ -215,14 +211,13 @@ const Checkout = () => {
               />
             </div>
           </div>
-
           <div className="mb-4">
-            <label className="block text-gray-700 ">Country</label>
+            <label className="block text-gray-700">Country</label>
             <input
               type="text"
               value={shippingAddress.country}
               onChange={(e) =>
-                setShippingAddress({
+                setShippingaAddress({
                   ...shippingAddress,
                   country: e.target.value,
                 })
@@ -231,36 +226,35 @@ const Checkout = () => {
               required
             />
           </div>
-
           <div className="mb-4">
-            <label className="block text-gray-700 ">PhoneNo</label>
+            <label className="block text-gray-700">Phone</label>
             <input
               type="tel"
               value={shippingAddress.phone}
               onChange={(e) =>
-                setShippingAddress({
+                setShippingaAddress({
                   ...shippingAddress,
                   phone: e.target.value,
                 })
               }
               className="w-full p-2 border rounded"
+              required
             />
           </div>
-
           <div className="mt-6">
             {!checkoutId ? (
               <button
                 type="submit"
-                className="w-full cursor-pointer bg-black text-white py-3 rounded"
+                className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition"
               >
-                Continue to payment
+                Continue to Payment
               </button>
             ) : (
               <div>
                 <h3 className="text-lg mb-4">Pay with Paypal</h3>
-                {/* PayPal Component */}
-                <PaypalButton
-                  amount={cart.totalPrice}
+                {/* Paypal component */}
+                <PayPalButton
+                  amount={totalPrice}
                   onSuccess={handlePaymentSuccess}
                   onError={(err) => alert("Payment failed. Try again.")}
                 />
@@ -269,48 +263,56 @@ const Checkout = () => {
           </div>
         </form>
       </div>
-
-      {/* Right Section */}
+      {/* Right section */}
       <div className="bg-gray-50 p-6 rounded-lg">
         <h3 className="text-lg mb-4">Order Summary</h3>
         <div className="border-t py-4 mb-4">
-          {cart.products.map((product, index) => (
-            <div
-              key={index}
-              className="flex items-start justify-between py-2 border-b"
-            >
-              <div className="flex items-start">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-20 h-24 object-cover mr-4"
-                />
-                <div>
-                  <h3 className="text-md">{product.name}</h3>
-                  <p className="text-gray-500">Size: {product.size}</p>
-                  <p className="text-gray-500">Color: {product.color}</p>
+          {cart.products.map((product, index) => {
+            const price = Number(product.price) || 0;
+            const quantity = Number(product.quantity) || 1;
+            const lineTotal = price * quantity;
+            
+            return (
+              <div
+                key={index}
+                className="flex items-start justify-between py-2 border-b"
+              >
+                <div className="flex items-start">
+                  <img
+                    src={product.image || "/placeholder.jpg"}
+                    alt={product.name}
+                    className="w-20 h-24 object-cover mr-4 rounded"
+                  />
+                  <div>
+                    <h3 className="text-md font-medium">{product.name}</h3>
+                    <p className="text-sm text-gray-500">Size: {product.size}</p>
+                    <p className="text-sm text-gray-500">Color: {product.color}</p>
+                    <p className="text-sm text-gray-500">Qty: {quantity}</p>
+                    <p className="text-sm text-gray-600 mt-1">${price.toFixed(2)} each</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-semibold">${lineTotal.toFixed(2)}</p>
                 </div>
               </div>
-              <p className="text-xl">${product.price?.toLocaleString()}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="flex justify-between items-center text-lg mb-4">
-          <p>SubTotal</p>
-          <p>${cart.totalPrice?.toLocaleString()}</p>
+          <p>Subtotal</p>
+          <p className="font-semibold">${totalPrice.toFixed(2)}</p>
         </div>
-
         <div className="flex justify-between items-center text-lg">
           <p>Shipping</p>
           <p>Free</p>
         </div>
-        <div className="flex justify-between items-center text-lg mt-4 border-t pt-4">
-          <p>Total</p>
-          <p>${cart.totalPrice?.toLocaleString()}</p>
+        <div className="flex justify-between items-center text-xl mt-4 border-t pt-4">
+          <p className="font-bold">Total</p>
+          <p className="font-bold">${totalPrice.toFixed(2)}</p>
         </div>
       </div>
     </div>
   );
 };
 
-export default Checkout;
+export default CheckOut;

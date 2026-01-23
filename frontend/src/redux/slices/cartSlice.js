@@ -1,15 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+//Helper function to calculate total price
+const calculateTotalPrice = (products) => {
+    if (!products || products.length === 0) return 0;
+    return products.reduce((total, product) => {
+        const price = Number(product.price) || 0;
+        const quantity = Number(product.quantity) || 1;
+        return total + (price * quantity);
+    }, 0);
+};
+
 //Helper function to load cart from localStorage
 const loadCartFromStorage = () => {
     const storedCart = localStorage.getItem("cart");
-    return storedCart ? JSON.parse(storedCart) : { products: [] };
+    if (storedCart) {
+        const cart = JSON.parse(storedCart);
+        // Recalculate totalPrice when loading from storage
+        cart.totalPrice = calculateTotalPrice(cart.products);
+        return cart;
+    }
+    return { products: [], totalPrice: 0 };
 }
 
 //Helper function to save Cart in localStorage
 const saveCartToStorage = (cart) => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    // Ensure totalPrice is calculated before saving
+    const cartToSave = {
+        ...cart,
+        totalPrice: calculateTotalPrice(cart.products)
+    };
+    localStorage.setItem("cart", JSON.stringify(cartToSave));
+    return cartToSave;
 }
 
 //Fetch Cart for a user or guest
@@ -96,7 +118,7 @@ const cartSlice = createSlice({
     },
     reducers: {
         clearCart: (state) => {
-            state.cart = { products: [] };
+            state.cart = { products: [], totalPrice: 0 };
             localStorage.removeItem("cart")
         }
     },
@@ -108,8 +130,11 @@ const cartSlice = createSlice({
             })
             .addCase(fetchCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload; // FIXED: was state.error
-                saveCartToStorage(action.payload)
+                const cartData = action.payload;
+                // Calculate totalPrice if not provided by backend
+                cartData.totalPrice = calculateTotalPrice(cartData.products);
+                state.cart = cartData;
+                saveCartToStorage(cartData)
             })
             .addCase(fetchCart.rejected, (state, action) => {
                 state.loading = false;
@@ -121,8 +146,10 @@ const cartSlice = createSlice({
             })
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload; // FIXED: was state.error
-                saveCartToStorage(action.payload)
+                const cartData = action.payload;
+                cartData.totalPrice = calculateTotalPrice(cartData.products);
+                state.cart = cartData;
+                saveCartToStorage(cartData)
             })
             .addCase(addToCart.rejected, (state, action) => {
                 state.loading = false;
@@ -134,8 +161,10 @@ const cartSlice = createSlice({
             })
             .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload; // FIXED: was state.error
-                saveCartToStorage(action.payload)
+                const cartData = action.payload;
+                cartData.totalPrice = calculateTotalPrice(cartData.products);
+                state.cart = cartData;
+                saveCartToStorage(cartData)
             })
             .addCase(updateCartItemQuantity.rejected, (state, action) => {
                 state.loading = false;
@@ -147,8 +176,10 @@ const cartSlice = createSlice({
             })
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload; // FIXED: was state.error
-                saveCartToStorage(action.payload)
+                const cartData = action.payload;
+                cartData.totalPrice = calculateTotalPrice(cartData.products);
+                state.cart = cartData;
+                saveCartToStorage(cartData)
             })
             .addCase(removeFromCart.rejected, (state, action) => {
                 state.loading = false;
@@ -160,8 +191,10 @@ const cartSlice = createSlice({
             })
             .addCase(mergeCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload; // FIXED: was state.error
-                saveCartToStorage(action.payload)
+                const cartData = action.payload;
+                cartData.totalPrice = calculateTotalPrice(cartData.products);
+                state.cart = cartData;
+                saveCartToStorage(cartData)
             })
             .addCase(mergeCart.rejected, (state, action) => {
                 state.loading = false;

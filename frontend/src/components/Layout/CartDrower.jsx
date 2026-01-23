@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { IoMdClose } from "react-icons/io";
 import CartContent from "../Cart/CartContent";
 import { useNavigate } from "react-router-dom";
@@ -11,10 +11,30 @@ const CartDrawer = ({ drawerOpen, toggleCartDrawer }) => {
   const { cart } = useSelector((state) => state.cart);
   const userId = user ? user._id : null;
 
-  // Safely calculate cart total
-  const cartTotal = cart?.totalPrice 
-    ? Number(cart.totalPrice).toFixed(2) 
-    : "0.00";
+  // // Safely calculate cart total
+  // const cartTotal = cart?.totalPrice
+  //   ? Number(cart.totalPrice).toFixed(2)
+  //   : "0.00";
+
+  const cartTotal = useMemo(() => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      return "0.00";
+    }
+
+    // Try to use cart.totalPrice if available
+    if (cart.totalPrice && Number(cart.totalPrice) > 0) {
+      return Number(cart.totalPrice).toFixed(2);
+    }
+
+    // Calculate from products
+    const calculated = cart.products.reduce((sum, product) => {
+      const price = Number(product.price) || 0;
+      const quantity = Number(product.quantity) || 1;
+      return sum + price * quantity;
+    }, 0);
+
+    return calculated.toFixed(2);
+  }, [cart]);
 
   const handleCheckOut = () => {
     toggleCartDrawer();
