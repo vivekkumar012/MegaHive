@@ -13,7 +13,9 @@ const CheckOut = () => {
   const { user } = useSelector((state) => state.auth);
 
   const [checkoutId, setCheckoutId] = useState(null);
-  const [shippingAddress, setShippingaAddress] = useState({
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
+  const [shippingAddress, setShippingAddress] = useState({
     firstName: "",
     lastName: "",
     address: "",
@@ -28,23 +30,32 @@ const CheckOut = () => {
     if (!cart || !cart.products || cart.products.length === 0) {
       return 0;
     }
-    
+
     // First try to use cart.totalPrice if it exists and is valid
     if (cart.totalPrice && Number(cart.totalPrice) > 0) {
       return Number(cart.totalPrice);
     }
-    
+
     // Otherwise calculate from products
     const calculated = cart.products.reduce((sum, product) => {
       const price = Number(product.price) || 0;
       const quantity = Number(product.quantity) || 1;
-      return sum + (price * quantity);
+      return sum + price * quantity;
     }, 0);
-    
+
     return calculated;
   }, [cart]);
 
-  //Ensure that cart is loaded before proceeding
+  // Check if user is logged in and has a valid token
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (!user || !token || token === "null" || token === "undefined") {
+      navigate("/login?redirect=checkout");
+      return;
+    }
+  }, [user, navigate]);
+
+  // Ensure that cart is loaded before proceeding
   useEffect(() => {
     if (!cart || !cart.products || cart.products.length === 0) {
       navigate("/");
@@ -53,20 +64,61 @@ const CheckOut = () => {
 
   const handleCreateCheckout = async (e) => {
     e.preventDefault();
-    if (cart && cart.products.length > 0 && totalPrice > 0) {
+    setCheckoutError(null);
+
+    // Validate user and token
+    const token = localStorage.getItem("userToken");
+    if (!user || !token || token === "null" || token === "undefined") {
+      setCheckoutError("Please log in to continue");
+      navigate("/login?redirect=checkout");
+      return;
+    }
+
+    // Validate cart
+    if (!cart || !cart.products || cart.products.length === 0) {
+      setCheckoutError("Your cart is empty");
+      return;
+    }
+
+    // Validate total price
+    if (totalPrice <= 0) {
+      setCheckoutError(
+        "Unable to proceed. Cart total is $0. Please check your cart.",
+      );
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
       const res = await dispatch(
         createCheckout({
           checkoutItems: cart.products,
           shippingAddress,
           paymentMethod: "Paypal",
           totalPrice: totalPrice,
-        })
+        }),
       );
+
       if (res.payload && res.payload._id) {
         setCheckoutId(res.payload._id);
+        setCheckoutError(null);
+      } else if (res.error) {
+        setCheckoutError(res.error.message || "Failed to create checkout");
+
+        // If unauthorized, redirect to login
+        if (
+          res.error.message?.includes("Not Authorized") ||
+          res.error.message?.includes("token")
+        ) {
+          setTimeout(() => navigate("/login?redirect=checkout"), 2000);
+        }
       }
-    } else {
-      alert("Unable to proceed. Cart total is $0. Please check your cart.");
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setCheckoutError(error.message || "Failed to create checkout");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -82,30 +134,30 @@ const CheckOut = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        }
+        },
       );
       await handleFinalizeCheckout(checkoutId);
     } catch (error) {
-      console.error(error);
+      console.error("Payment error:", error);
+      setCheckoutError("Payment processing failed. Please try again.");
     }
   };
 
   const handleFinalizeCheckout = async (checkoutId) => {
     try {
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/checkout/${checkoutId}/finalize`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/finalize`,
         {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        }
+        },
       );
       navigate("/order-confirmation");
     } catch (error) {
-      console.error(error);
+      console.error("Finalize error:", error);
+      setCheckoutError("Failed to finalize order. Please contact support.");
     }
   };
 
@@ -120,6 +172,14 @@ const CheckOut = () => {
       {/* left section */}
       <div className="bg-white rounded-lg p-6">
         <h2 className="text-2xl uppercase mb-6">Checkout</h2>
+
+        {/* Error Message */}
+        {checkoutError && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {checkoutError}
+          </div>
+        )}
+
         <form onSubmit={handleCreateCheckout}>
           <h3 className="text-lg mb-4">Contact Details</h3>
           <div className="mb-4">
@@ -139,7 +199,7 @@ const CheckOut = () => {
                 type="text"
                 value={shippingAddress.firstName}
                 onChange={(e) =>
-                  setShippingaAddress({
+                  setShippingAddress({
                     ...shippingAddress,
                     firstName: e.target.value,
                   })
@@ -154,7 +214,7 @@ const CheckOut = () => {
                 type="text"
                 value={shippingAddress.lastName}
                 onChange={(e) =>
-                  setShippingaAddress({
+                  setShippingAddress({
                     ...shippingAddress,
                     lastName: e.target.value,
                   })
@@ -170,7 +230,7 @@ const CheckOut = () => {
               type="text"
               value={shippingAddress.address}
               onChange={(e) =>
-                setShippingaAddress({
+                setShippingAddress({
                   ...shippingAddress,
                   address: e.target.value,
                 })
@@ -186,7 +246,7 @@ const CheckOut = () => {
                 type="text"
                 value={shippingAddress.city}
                 onChange={(e) =>
-                  setShippingaAddress({
+                  setShippingAddress({
                     ...shippingAddress,
                     city: e.target.value,
                   })
@@ -201,7 +261,7 @@ const CheckOut = () => {
                 type="text"
                 value={shippingAddress.postalCode}
                 onChange={(e) =>
-                  setShippingaAddress({
+                  setShippingAddress({
                     ...shippingAddress,
                     postalCode: e.target.value,
                   })
@@ -217,7 +277,7 @@ const CheckOut = () => {
               type="text"
               value={shippingAddress.country}
               onChange={(e) =>
-                setShippingaAddress({
+                setShippingAddress({
                   ...shippingAddress,
                   country: e.target.value,
                 })
@@ -232,7 +292,7 @@ const CheckOut = () => {
               type="tel"
               value={shippingAddress.phone}
               onChange={(e) =>
-                setShippingaAddress({
+                setShippingAddress({
                   ...shippingAddress,
                   phone: e.target.value,
                 })
@@ -245,18 +305,29 @@ const CheckOut = () => {
             {!checkoutId ? (
               <button
                 type="submit"
-                className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition"
+                disabled={isProcessing}
+                className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Continue to Payment
+                {isProcessing ? "Processing..." : "Continue to Payment"}
               </button>
             ) : (
               <div>
                 <h3 className="text-lg mb-4">Pay with Paypal</h3>
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-sm text-gray-700">
+                    Total Amount: <strong>${totalPrice.toFixed(2)}</strong>
+                  </p>
+                </div>
                 {/* Paypal component */}
                 <PayPalButton
-                  amount={totalPrice}
+                  amount={totalPrice.toFixed(2)}
                   onSuccess={handlePaymentSuccess}
-                  onError={(err) => alert("Payment failed. Try again.")}
+                  onError={(err) => {
+                    console.error("PayPal error:", err);
+                    setCheckoutError(
+                      err.message || "Payment failed. Please try again.",
+                    );
+                  }}
                 />
               </div>
             )}
@@ -271,7 +342,7 @@ const CheckOut = () => {
             const price = Number(product.price) || 0;
             const quantity = Number(product.quantity) || 1;
             const lineTotal = price * quantity;
-            
+
             return (
               <div
                 key={index}
@@ -285,14 +356,22 @@ const CheckOut = () => {
                   />
                   <div>
                     <h3 className="text-md font-medium">{product.name}</h3>
-                    <p className="text-sm text-gray-500">Size: {product.size}</p>
-                    <p className="text-sm text-gray-500">Color: {product.color}</p>
+                    <p className="text-sm text-gray-500">
+                      Size: {product.size}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Color: {product.color}
+                    </p>
                     <p className="text-sm text-gray-500">Qty: {quantity}</p>
-                    <p className="text-sm text-gray-600 mt-1">${price.toFixed(2)} each</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      ${price.toFixed(2)} each
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-semibold">${lineTotal.toFixed(2)}</p>
+                  <p className="text-lg font-semibold">
+                    ${lineTotal.toFixed(2)}
+                  </p>
                 </div>
               </div>
             );

@@ -11,10 +11,6 @@ const CartDrawer = ({ drawerOpen, toggleCartDrawer }) => {
   const { cart } = useSelector((state) => state.cart);
   const userId = user ? user._id : null;
 
-  // // Safely calculate cart total
-  // const cartTotal = cart?.totalPrice
-  //   ? Number(cart.totalPrice).toFixed(2)
-  //   : "0.00";
 
   const cartTotal = useMemo(() => {
     if (!cart || !cart.products || cart.products.length === 0) {
