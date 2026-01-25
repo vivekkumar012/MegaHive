@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import PayPalButton from "./PayPalButton";
+import PayPalButton from "./PaypalButton";
 import { useDispatch, useSelector } from "react-redux";
 
 import axios from "axios";
@@ -30,26 +30,26 @@ const CheckOut = () => {
     if (!cart || !cart.products || cart.products.length === 0) {
       return 0;
     }
-
+    
     // First try to use cart.totalPrice if it exists and is valid
     if (cart.totalPrice && Number(cart.totalPrice) > 0) {
       return Number(cart.totalPrice);
     }
-
+    
     // Otherwise calculate from products
     const calculated = cart.products.reduce((sum, product) => {
       const price = Number(product.price) || 0;
       const quantity = Number(product.quantity) || 1;
-      return sum + price * quantity;
+      return sum + (price * quantity);
     }, 0);
-
+    
     return calculated;
   }, [cart]);
 
   // Check if user is logged in and has a valid token
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    if (!user || !token || token === "null" || token === "undefined") {
+    if (!user || !token || token === 'null' || token === 'undefined') {
       navigate("/login?redirect=checkout");
       return;
     }
@@ -65,10 +65,10 @@ const CheckOut = () => {
   const handleCreateCheckout = async (e) => {
     e.preventDefault();
     setCheckoutError(null);
-
+    
     // Validate user and token
     const token = localStorage.getItem("userToken");
-    if (!user || !token || token === "null" || token === "undefined") {
+    if (!user || !token || token === 'null' || token === 'undefined') {
       setCheckoutError("Please log in to continue");
       navigate("/login?redirect=checkout");
       return;
@@ -82,9 +82,7 @@ const CheckOut = () => {
 
     // Validate total price
     if (totalPrice <= 0) {
-      setCheckoutError(
-        "Unable to proceed. Cart total is $0. Please check your cart.",
-      );
+      setCheckoutError("Unable to proceed. Cart total is $0. Please check your cart.");
       return;
     }
 
@@ -97,7 +95,7 @@ const CheckOut = () => {
           shippingAddress,
           paymentMethod: "Paypal",
           totalPrice: totalPrice,
-        }),
+        })
       );
 
       if (res.payload && res.payload._id) {
@@ -105,12 +103,10 @@ const CheckOut = () => {
         setCheckoutError(null);
       } else if (res.error) {
         setCheckoutError(res.error.message || "Failed to create checkout");
-
+        
         // If unauthorized, redirect to login
-        if (
-          res.error.message?.includes("Not Authorized") ||
-          res.error.message?.includes("token")
-        ) {
+        if (res.error.message?.includes("Not Authorized") || 
+            res.error.message?.includes("token")) {
           setTimeout(() => navigate("/login?redirect=checkout"), 2000);
         }
       }
@@ -134,7 +130,7 @@ const CheckOut = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        },
+        }
       );
       await handleFinalizeCheckout(checkoutId);
     } catch (error) {
@@ -152,7 +148,7 @@ const CheckOut = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           },
-        },
+        }
       );
       navigate("/order-confirmation");
     } catch (error) {
@@ -172,7 +168,7 @@ const CheckOut = () => {
       {/* left section */}
       <div className="bg-white rounded-lg p-6">
         <h2 className="text-2xl uppercase mb-6">Checkout</h2>
-
+        
         {/* Error Message */}
         {checkoutError && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -313,11 +309,15 @@ const CheckOut = () => {
             ) : (
               <div>
                 <h3 className="text-lg mb-4">Pay with Paypal</h3>
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-sm text-gray-700">
-                    Total Amount: <strong>${totalPrice.toFixed(2)}</strong>
-                  </p>
+                
+                {/* Debug Info - Remove after fixing */}
+                <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded text-xs">
+                  <p><strong>Debug Info:</strong></p>
+                  <p>Amount: ${totalPrice.toFixed(2)}</p>
+                  <p>Checkout ID: {checkoutId}</p>
+                  <p>Client ID: {import.meta.env.VITE_PAYPAL_CLIENT_ID ? '✅ Set' : '❌ Missing'}</p>
                 </div>
+
                 {/* Paypal component */}
                 <PayPalButton
                   amount={totalPrice.toFixed(2)}
@@ -325,7 +325,7 @@ const CheckOut = () => {
                   onError={(err) => {
                     console.error("PayPal error:", err);
                     setCheckoutError(
-                      err.message || "Payment failed. Please try again.",
+                      err.message || "Payment failed. Please try again."
                     );
                   }}
                 />
@@ -342,7 +342,7 @@ const CheckOut = () => {
             const price = Number(product.price) || 0;
             const quantity = Number(product.quantity) || 1;
             const lineTotal = price * quantity;
-
+            
             return (
               <div
                 key={index}
@@ -356,22 +356,14 @@ const CheckOut = () => {
                   />
                   <div>
                     <h3 className="text-md font-medium">{product.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      Size: {product.size}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Color: {product.color}
-                    </p>
+                    <p className="text-sm text-gray-500">Size: {product.size}</p>
+                    <p className="text-sm text-gray-500">Color: {product.color}</p>
                     <p className="text-sm text-gray-500">Qty: {quantity}</p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      ${price.toFixed(2)} each
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1">${price.toFixed(2)} each</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-semibold">
-                    ${lineTotal.toFixed(2)}
-                  </p>
+                  <p className="text-lg font-semibold">${lineTotal.toFixed(2)}</p>
                 </div>
               </div>
             );
