@@ -18,11 +18,11 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=39",
+        url: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&h=500&fit=crop",
         altText: "Classic Oxford Button-Down Shirt Front View",
       },
       {
-        url: "https://picsum.photos/500/500?random=40",
+        url: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=500&fit=crop",
         altText: "Classic Oxford Button-Down Shirt Back View",
       },
     ],
@@ -46,11 +46,11 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=41",
+        url: "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=500&h=500&fit=crop",
         altText: "Slim-Fit Stretch Shirt Front View",
       },
       {
-        url: "https://picsum.photos/500/500?random=42",
+        url: "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=500&h=500&fit=crop",
         altText: "Slim-Fit Stretch Shirt Back View",
       },
     ],
@@ -74,11 +74,11 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=43",
+        url: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500&h=500&fit=crop",
         altText: "Casual Denim Shirt Front View",
       },
       {
-        url: "https://picsum.photos/500/500?random=44",
+        url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=500&h=500&fit=crop",
         altText: "Casual Denim Shirt Back View",
       },
     ],
@@ -102,11 +102,11 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=45",
+        url: "https://images.unsplash.com/photo-1622445275576-721325763afe?w=500&h=500&fit=crop",
         altText: "Printed Resort Shirt Front View",
       },
       {
-        url: "https://picsum.photos/500/500?random=1",
+        url: "https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=500&h=500&fit=crop",
         altText: "Printed Resort Shirt Back View",
       },
     ],
@@ -158,11 +158,11 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=3",
+        url: "https://images.unsplash.com/photo-1625665506923-b8a1f0e4b1e7?w=500&h=500&fit=crop",
         altText: "Polo T-Shirt Front View",
       },
       {
-        url: "https://picsum.photos/500/500?random=4",
+        url: "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=500&h=500&fit=crop",
         altText: "Polo T-Shirt Back View",
       },
     ],
@@ -186,7 +186,7 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=5",
+        url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
         altText: "Oversized Graphic T-Shirt Front View",
       },
     ],
@@ -282,7 +282,7 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=9",
+        url: "https://images.unsplash.com/photo-1555689502-c4b22d76c56f?w=500&h=500&fit=crop",
         altText: "Slim Fit Joggers Front View",
       },
     ],
@@ -354,7 +354,7 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=12",
+        url: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop",
         altText: "Denim Jeans Front View",
       },
     ],
@@ -378,7 +378,7 @@ const products = [
     gender: "Men",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=13",
+        url: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&h=500&fit=crop",
         altText: "Chino Pants Front View",
       },
     ],
@@ -762,7 +762,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=29",
+        url: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=500&fit=crop",
         altText: "Knitted Cropped Top",
       },
     ],
@@ -786,7 +786,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=30",
+        url: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500&h=500&fit=crop",
         altText: "Boho Floral Blouse",
       },
     ],
@@ -810,7 +810,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=31",
+        url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
         altText: "Casual T-Shirt",
       },
     ],
@@ -834,7 +834,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=32",
+        url: "https://imgs.search.brave.com/rZimniWnw59Ufixj4m-NUF0Sj5mtQ9-CZ_nwyzYcIxE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zaG93/b2ZmZmYuaW4vY2Ru/L3Nob3AvZmlsZXMv/Q0hOLTg5MDVfQmxh/Y2tfMl8zNzZlYzU3/Ni04ODliLTQxMzQt/YmI5Mi1mMDk3MDBj/NDhkOTEuanBnP3Y9/MTczMjYyMzQyMiZ3/aWR0aD0xMDgw",
         altText: "Off-Shoulder Top",
       },
     ],
@@ -858,7 +858,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=33",
+        url: "https://imgs.search.brave.com/MHvFRkwlcXVIyR9a_NN8MaNJebrzGwXZkRvEFajZJUo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zaG9w/dGluYXN0ZXBoZW5z/LmNvbS9jZG4vc2hv/cC9wcm9kdWN0cy9M/YWNlVHJpbW1lZENh/bWlfMTQ0X1BsdW1f/MTAyNHgxMDI0Lmpw/Zz92PTE2NjgyNTk2/MDg",
         altText: "Lace-Trimmed Cami Top",
       },
     ],
@@ -882,7 +882,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=34",
+        url: "https://imgs.search.brave.com/Uc9Uca1ue-O6Ot3VZQYKtODm6D4WKxW9Wr0HCgFTi7w/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/ODFGaWpnbThaakwu/anBn",
         altText: "Graphic Print Tee",
       },
     ],
@@ -906,7 +906,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=35",
+        url: "https://imgs.search.brave.com/z3m1eBn2WP6j4ttw8YfmpsS8ukZ-JWMMfZ8gARYItxE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9kamVy/ZmF2ZW51ZS5jb20v/bWVkaWEvaW1hZ2Vz/LzEwOV81ZGU2NTgw/ZTYyLTEwMDg1LTEw/MDItMy1vcmlnaW5h/bC5qcGcvP2F1dG89/Zm9ybWF0Jnc9MTYw/MCZxPTgw",
         altText: "Ribbed Long-Sleeve Top",
       },
     ],
@@ -930,7 +930,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=36",
+        url: "https://imgs.search.brave.com/zHf6zcRRTg2DHGp_kPe0hjqDM45KsdWKyUEIL6qWy4A/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMuaGVyemluZGFn/aS5pbmZvL2ltYWdl/LzIwMjQvTWF5L29y/Z2FuemEtcnVmZmxl/LXNsZWV2ZS1ibG91/c2UtZGVzaWduLmpw/Zw",
         altText: "Ruffle-Sleeve Blouse",
       },
     ],
@@ -954,7 +954,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=37",
+        url: "https://imgs.search.brave.com/mFaaGsVA19jvemfPSpULAl1lg8_5YEV9C0F8oEOf5fw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMtbmEuc3NsLWlt/YWdlcy1hbWF6b24u/Y29tL2ltYWdlcy9J/LzgxTzhPMnlpQXVM/LmpwZw",
         altText: "Classic Button-Up Shirt",
       },
     ],
@@ -978,7 +978,7 @@ const products = [
     gender: "Women",
     images: [
       {
-        url: "https://picsum.photos/500/500?random=38",
+        url: "https://imgs.search.brave.com/zJcU8pIl36XdYIdsQfEST-EHJFTdaRT3DNKzu-AK_W4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/ODFDNi1RMWhaYkwu/anBn",
         altText: "V-Neck Wrap Top",
       },
     ],
